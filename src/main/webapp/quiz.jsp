@@ -60,6 +60,21 @@
 
     }
 
+    function updateTitle(){
+
+        if(current_question < 0) // Only check if we're on an active question
+            return;
+
+        var pointInTimeNextQuestion = quiz.startTime;
+        for(var i = 0; i <= current_question; i++)
+            pointInTimeNextQuestion += +quiz.questions[i].duration_seconds;
+
+        var now = Math.floor(new Date().getTime()/1000);
+        var timeLeft = pointInTimeNextQuestion - now;
+
+        $(".active_question").first().find(".question_seconds_left").html("(" + timeLeft + " / " + quiz.questions[current_question].duration_seconds + " seconds left)");
+    }
+
     // Check if user chose right answer
     function rightAnswer(){
       if(current_question < 0)
@@ -117,6 +132,8 @@
             $("#starts_in").html(starts_in);
             $("#max_score").html(quiz.questions.length);
 
+            updateTitle();
+
             var newActiveQuestion = getActiveQuestion();
             if(newActiveQuestion != current_question){  // We are jumping to next question
 
@@ -162,6 +179,7 @@
 
 <div class="card card-body bg-light question_template inactive_question">
     <h2 class="card-title">Question 1/10</h2>
+    <span class="question_seconds_left"></span>
     <div class="question_text">
         BLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONS
     </div>
