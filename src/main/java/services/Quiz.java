@@ -14,7 +14,6 @@ public class Quiz implements Serializable {
     private int duration_seconds;
     private long startTime; //seconds from 1970
 
-
     public Quiz(String name){
         this();
         this.name = name;

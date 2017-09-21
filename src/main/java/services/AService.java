@@ -5,6 +5,7 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -12,6 +13,33 @@ import java.util.List;
 public class AService {
 
     private static HashMap<String, Quiz> quizes = new HashMap<String, Quiz>();
+
+    static{
+        for(int i = 0; i < 50; i++){
+            Quiz quiz = new Quiz("Quiz " + i);
+            Question q1 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
+            Question q2 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
+            Question q3 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
+            Question q4 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
+            Question q5 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
+            Question q6 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
+            Question q7 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
+
+            quiz.addQuestion(q1);
+            quiz.addQuestion(q2);
+            quiz.addQuestion(q3);
+            quiz.addQuestion(q4);
+            quiz.addQuestion(q5);
+            quiz.addQuestion(q6);
+            quiz.addQuestion(q7);
+
+            quiz.setStartTime((new Date().getTime()/1000)+i*140);
+            quiz.setDuration_seconds(140);
+
+            quizes.put(quiz.getUuid(), quiz);
+        }
+    }
+
     @GET 
     @Produces(MediaType.APPLICATION_JSON)
     public Response getQuizzes() {
