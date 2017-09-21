@@ -1,7 +1,9 @@
 package services;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.UUID;
 
 public class Quiz implements Serializable {
@@ -10,6 +12,8 @@ public class Quiz implements Serializable {
     private ArrayList<String> nicks = new ArrayList<String>();
     private ArrayList<Question> questions = new ArrayList<Question>();
     private int duration_seconds;
+    private long startTime; //seconds from 1970
+
 
     public Quiz(String name){
         this();
@@ -64,4 +68,8 @@ public class Quiz implements Serializable {
     public void setNicks(ArrayList<String> nicks) {
         this.nicks = nicks;
     }
+
+    public long getStartTime() {return startTime;}
+    public void setStartTime(long startTime) {this.startTime = startTime;}
+
 }

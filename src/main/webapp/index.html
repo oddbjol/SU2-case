@@ -14,8 +14,15 @@
         <script src="http://cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"></script>
         <script src="js/popper.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
+        <style>
+            tr{
+                cursor: pointer;
+            }
+        </style>
         <script>
             $(document).ready(function(){
+
+                var selected_uuid;
 
                 var tbl = $('#tbl').DataTable( {
                     ajax: {
@@ -38,29 +45,73 @@
                 });
 
                 tbl.on('click','tr',function(){
-                    var uuid = tbl.row(this).data().uuid;
-                    window.location.href="http://localhost:8080/case/quiz.jsp?uuid="+uuid;
-
+                    selected_uuid = tbl.row(this).data().uuid;
+                    $("#myModal").modal("show");
                 });
 
                 setInterval(function(){
                     tbl.ajax.reload();
                 }, 1000);
 
+                $("#join_quiz").click(function(){
+                    var nickname = $("#nickname").val();
+                    if(!nickname){
+                        alert("You must choose a nickname!");
+                        return;
+                    }
+
+                    $.ajax({
+                        url: 'rest/quizes/quiz/' + selected_uuid + '/join',
+                        type: 'POST',
+                        data: nickname,
+                        contentType: 'text/plain;',
+                        success: function(result) {
+                            window.location.href="quiz.jsp?uuid=" + selected_uuid + "&nickname=" + nickname;
+                        }
+                    });
+
+
+                });
+
+                $("#cancel_join").click(function(){
+                    $("#nickname").val("");
+                });
 
             });
         </script>
     </head>
     <body>
 
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Choose a nickname to join.</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <label for="nickname">Nickname: </label>
+                    <input type="text" id="nickname" placeholder="nick goes here">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel_join" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="join_quiz">Join quiz!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container" >
         <div id="frontpage">
             <table class="table table-responsive table-hover" id="tbl">
                 <thead>
                     <th style="display:none"></th>
-                    <th>Quiz-navn</th>
-                    <th>Antall deltagere</th>
-                    <th>Tid som gjenstår</th>
+                    <th>Quiz name</th>
+                    <th>Contestants</th>
+                    <th>Remaining time (s)</th>
                 </thead>
                 <tbody id="tbody">
                 </tbody>
