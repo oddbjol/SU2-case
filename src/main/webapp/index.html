@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="http://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+        <link rel="stylesheet" href="css/style.css" />
+
+        <script src="js/jquery-3.2.1.min.js"></script>
+        <script src="http://cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"></script>
+        <script src="js/popper.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script>
+            $(document).ready(function(){
+
+                var tbl = $('#tbl').DataTable( {
+                    ajax: {
+                        url: 'rest/quizes/',
+                        dataSrc: ''
+                    },
+                    columns: [
+                        { data: 'uuid', visible: false },
+                        { data: 'name' },
+                        { data: 'nicks',
+                        render: function(data, type, row, meta){
+                            return data.length;
+                        }},
+                        { data: 'duration_seconds',}
+                    ],
+                    searching: false,
+                    paging: false,
+                    ordering: false,
+                    bInfo: false
+                });
+
+                tbl.on('click','tr',function(){
+                    var uuid = tbl.row(this).data().uuid;
+                    window.location.href="http://localhost:8080/case/quiz.jsp?uuid="+uuid;
+
+                });
+
+                setInterval(function(){
+                    tbl.ajax.reload();
+                }, 1000);
+
+
+            });
+        </script>
+    </head>
+    <body>
+
+    <div class="container" >
+        <div id="frontpage">
+            <table class="table table-responsive table-hover" id="tbl">
+                <thead>
+                    <th style="display:none"></th>
+                    <th>Quiz-navn</th>
+                    <th>Antall deltagere</th>
+                    <th>Tid som gjenstår</th>
+                </thead>
+                <tbody id="tbody">
+                </tbody>
+            </table>
+            <a href="addQuiz.html" class="btn btn-primary">New quiz</a>
+        </div>
+    </div>
+    </body>
+</html>
