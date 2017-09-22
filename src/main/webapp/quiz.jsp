@@ -36,6 +36,8 @@
     let quiz;
     let current_question = -1; // current question is "quiz not started"
     let score = 0;
+    let uuid;
+    let nick;
 
     // -1 if quiz hasn't started, -2 if it's over, otherwise index of right question.
     function getActiveQuestion(){
@@ -98,6 +100,14 @@
         if(current_question >= 0){
             if(rightAnswer()){
                 score++;
+
+                 $.ajax({
+                    url: 'rest/quizes/quiz/' + uuid + '/setScore/' + nick,
+                    type: 'POST',
+                    data:  JSON.stringify(score),
+                    contentType: 'application/json'
+                });
+
                 //TODO: play chime
             }
             else{
@@ -144,8 +154,20 @@
     }
 
     $(document).ready(function(){
-        let uuid = "<%= request.getParameter("uuid") %>";
+        uuid = "<%= request.getParameter("uuid") %>";
+        nick = "<%= request.getParameter("nickname") %>";
         let url = "rest/quizes/quiz/" + uuid;
+
+        $.ajax({
+            url: url + '/join',
+            type: 'POST',
+            data: nick,
+            contentType: 'text/plain;',
+            success: function(result) {
+                score = +result;
+            }
+        });
+
         $.getJSON(url, null, function(data){
             quiz = data;
 

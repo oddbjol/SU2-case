@@ -61,15 +61,9 @@
                         return;
                     }
 
-                    $.ajax({
-                        url: 'rest/quizes/quiz/' + selected_uuid + '/join',
-                        type: 'POST',
-                        data: nickname,
-                        contentType: 'text/plain;',
-                        success: function(result) {
-                            window.location.href="quiz.jsp?uuid=" + selected_uuid + "&nickname=" + nickname;
-                        }
-                    });
+                    window.location.href="quiz.jsp?uuid=" + selected_uuid + "&nickname=" + nickname;
+
+
 
 
                 });

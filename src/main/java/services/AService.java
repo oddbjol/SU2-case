@@ -61,7 +61,34 @@ public class AService {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("quiz/{uuid}/join")
     public Response joinQuiz(@PathParam("uuid") String uuid, String nick){
-        quizes.get(uuid).addNick(nick);
+        uuid=uuid.trim();
+        nick=nick.trim();
+
+        Quiz curQuiz = quizes.get(uuid);
+        HashMap<String, Integer> curScoreboard = curQuiz.getScoreboard();
+
+        int score = 0;
+
+        // If user is already participating in quiz, don't re-add him. return his current score.
+        if(curScoreboard.containsKey(nick))
+            score = curScoreboard.get(nick);
+        else
+            curQuiz.addNick(nick);
+
+        return Response.ok(score).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("quiz/{uuid}/setScore/{nick}")
+    public Response setScore(@PathParam("uuid") String uuid, @PathParam("nick") String nick, int score){
+        uuid=uuid.trim();
+        nick=nick.trim();
+
+        Quiz curQuiz = quizes.get(uuid);
+        HashMap<String, Integer> curScoreboard = curQuiz.getScoreboard();
+
+        curScoreboard.put(nick, score);
 
         return Response.ok().build();
     }
