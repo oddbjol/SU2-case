@@ -1,27 +1,38 @@
 package services;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class Quiz implements Serializable {
     private String uuid;
     private String name;
-    private ArrayList<String> nicks = new ArrayList<String>();
+    private HashMap<String, Integer> scoreboard = new HashMap<String, Integer>();
     private ArrayList<Question> questions = new ArrayList<Question>();
     private int duration_seconds;
     private long startTime; //seconds from 1970
 
+    public HashMap<String, Integer> getScoreboard() {
+        return scoreboard;
+    }
+
+    public void setScoreboard(HashMap<String, Integer> scoreboard) {
+        this.scoreboard = scoreboard;
+    }
+
     public Quiz(String name){
         this();
         this.name = name;
+
     }
 
     public Quiz(){uuid = UUID.randomUUID().toString();}
 
-    public void addNick(String nick){nicks.add(nick);}
+    public void addNick(String nick){
+        scoreboard.put(nick, 0);
+    }
 
     public void addQuestion(Question question){
         questions.add(question);
@@ -58,14 +69,6 @@ public class Quiz implements Serializable {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
-    }
-
-    public ArrayList<String> getNicks() {
-        return nicks;
-    }
-
-    public void setNicks(ArrayList<String> nicks) {
-        this.nicks = nicks;
     }
 
     public long getStartTime() {return startTime;}

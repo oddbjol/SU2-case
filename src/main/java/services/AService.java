@@ -35,6 +35,9 @@ public class AService {
 
             quiz.setStartTime((new Date().getTime()/1000)+i*140);
             quiz.setDuration_seconds(140);
+            quiz.addNick("testperson");
+            if(i == 0) // first quiz gets extra contestant for testing purposes
+                quiz.addNick("testperson 2");
 
             quizes.put(quiz.getUuid(), quiz);
         }

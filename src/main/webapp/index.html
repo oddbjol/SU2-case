@@ -32,11 +32,12 @@
                     columns: [
                         { data: 'uuid', visible: false },
                         { data: 'name' },
-                        { data: 'nicks',
-                        render: function(data, type, row, meta){
-                            return data.length;
+                        { data: 'scoreboard',
+                        render: function(data,type,row,meta){
+                            return Object.keys(data).length;    // Count the number of entries in the "scoreboard" object.
+                                                                // This is also the number of contestants.
                         }},
-                        { data: 'duration_seconds',}
+                        { data: 'duration_seconds'}
                     ],
                     searching: false,
                     paging: false,
