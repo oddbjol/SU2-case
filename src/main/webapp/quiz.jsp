@@ -14,10 +14,10 @@
             display: none;
         }
         .active_question{
-            background-color: green !important;
+            'background-color: green !important;
         }
         .inactive_question{
-            //display: none;
+            display: none;
         }
         [type='radio']{
             display: none;
@@ -32,15 +32,15 @@
     <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script>
-
-    var quiz;
-    var current_question = -1; // current question is "quiz not started"
-    var score = 0;
+    "use strict"
+    let quiz;
+    let current_question = -1; // current question is "quiz not started"
+    let score = 0;
 
     // -1 if quiz hasn't started, -2 if it's over, otherwise index of right question.
     function getActiveQuestion(){
-        var now = Math.floor(new Date().getTime()/1000); //seconds since 1970
-        var time_spent = now - quiz.startTime;
+        let now = Math.floor(new Date().getTime()/1000); //seconds since 1970
+        let time_spent = now - quiz.startTime;
 
         if(time_spent < 0){ // Still waiting for quiz to start...
             return -1;
@@ -49,8 +49,8 @@
             return -2;
         }
         // The quiz should be active.
-        var time_counter = 0;
-        for(var i = 0; i < quiz.questions.length; i++){
+        let time_counter = 0;
+        for(let i = 0; i < quiz.questions.length; i++){
             time_counter += quiz.questions[i].duration_seconds;
             if(time_counter > time_spent)   // This means the user is currently answering questions[i]. index = i.
                 return i;
@@ -65,23 +65,23 @@
         if(current_question < 0) // Only check if we're on an active question
             return;
 
-        var pointInTimeNextQuestion = quiz.startTime;
-        for(var i = 0; i <= current_question; i++)
+        let pointInTimeNextQuestion = quiz.startTime;
+        for(let i = 0; i <= current_question; i++)
             pointInTimeNextQuestion += +quiz.questions[i].duration_seconds;
 
-        var now = Math.floor(new Date().getTime()/1000);
-        var timeLeft = pointInTimeNextQuestion - now;
+        let now = Math.floor(new Date().getTime()/1000);
+        let timeLeft = pointInTimeNextQuestion - now;
 
         $(".active_question").first().find(".question_seconds_left").html("(" + timeLeft + " / " + quiz.questions[current_question].duration_seconds + " seconds left)");
     }
 
-    // Check if user chose right answer
+    // Check if user has chosen the right answer for the current question
     function rightAnswer(){
       if(current_question < 0)
         return false;   // Not a valid question.
 
-    var correctAnswerIndex = quiz.questions[current_question].right_answer;
-    var currentAnswerIndex = $(".active_question").first().find(".btn.active").find(".radio").val()
+    let correctAnswerIndex = quiz.questions[current_question].right_answer;
+    let currentAnswerIndex = $(".active_question").first().find(".btn.active").find(".radio").val()
 
 
     console.log("you selected " + currentAnswerIndex + " correct is: " + correctAnswerIndex);
@@ -89,30 +89,85 @@
 
     }
 
+    // Adds 1 to current score if right answer is selected, and sends score to server.
+    // Updates user's score on website
+    // TODO: Send score to server
+    function checkAndUpdateScore(){
+
+        // We won't bother checking if the quiz hasn't started or has ended
+        if(current_question >= 0){
+            if(rightAnswer()){
+                score++;
+                //TODO: play chime
+            }
+            else{
+                //TODO: play annoying honking sound
+            }
+        }
+
+        $("#score").html(score);
+    }
+
+    function Tick(){
+        let now = Math.floor(new Date().getTime()/1000);    // seconds since 1970
+        let starts_in = quiz.startTime - now;               // seconds until quiz starts. if negative, quiz has started.
+
+        // if quiz has NOT started
+        if(starts_in > 0)
+            $("#starts_in").html(starts_in);
+        else
+            $("#starts_in").html("quiz has started!");
+
+        let newActiveQuestion = getActiveQuestion();
+
+        // If quiz hasn't started yet, we don't need to do anything else in this tick.
+        if(newActiveQuestion < 0)
+            return;
+
+        updateTitle();
+
+        if(newActiveQuestion != current_question){  // We are jumping to next question
+
+            checkAndUpdateScore();
+
+            current_question = newActiveQuestion;
+
+            if(newActiveQuestion == -2){    // quiz is over!!!!
+                $(".question").addClass("inactive_question").removeClass("active_question");
+                alert("thanks for playing");
+                return;
+            }
+
+            $(".question:eq("  + current_question + ")").addClass("active_question").removeClass("inactive_question");
+            $(".question").not(':eq(' + current_question + ')').addClass("inactive_question").removeClass("active_question");
+        }
+    }
+
     $(document).ready(function(){
-        var uuid = "<%= request.getParameter("uuid") %>";
-        var url = "rest/quizes/quiz/" + uuid;
+        let uuid = "<%= request.getParameter("uuid") %>";
+        let url = "rest/quizes/quiz/" + uuid;
         $.getJSON(url, null, function(data){
             quiz = data;
 
             $("#quiz_name").html(quiz.name);
             $("#quiz_duration").html(quiz.duration_seconds);
             $("#nickname").html("<%= request.getParameter("nickname") %>");
+            $("#max_score").html(quiz.questions.length);
 
-            for( var i = 0; i < quiz.questions.length; i++) {
-                var question = quiz.questions[i];
+            for( let i = 0; i < quiz.questions.length; i++) {
+                let question = quiz.questions[i];
 
-                var question_box = $(".question_template").first().clone(true,true);
+                let question_box = $(".question_template").first().clone(true,true);
                 question_box.removeClass("question_template");
                 question_box.addClass("question");
 
                 question_box.find(".card-title").html("Question " + (i+1) + " of " + quiz.questions.length);
                 question_box.find(".question_text").html(question.question);
 
-                for(var j = 0; j < question.answers.length; j++){
-                    var answer = question.answers[j];
+                for(let j = 0; j < question.answers.length; j++){
+                    let answer = question.answers[j];
 
-                    var answer_box = $(".answer_template").first().clone(true,true);
+                    let answer_box = $(".answer_template").first().clone(true,true);
                     answer_box.removeClass("answer_template");
                     answer_box.addClass("answer");
 
@@ -126,42 +181,7 @@
             }
         });
 
-        setInterval(function(){
-            var now = Math.floor(new Date().getTime()/1000); // seconds since 1970
-            var starts_in = quiz.startTime - now;   // seconds until quiz starts. if negative, quiz has started.
-            $("#starts_in").html(starts_in);
-            $("#max_score").html(quiz.questions.length);
-
-            updateTitle();
-
-            var newActiveQuestion = getActiveQuestion();
-            if(newActiveQuestion != current_question){  // We are jumping to next question
-
-                if(current_question >= 0){ // Don't bother scoring questions that don't exist
-                    if(rightAnswer())
-                        score++;
-                }
-
-                current_question = newActiveQuestion;
-
-                $("#score").html(score);
-
-                if(newActiveQuestion == -2){    // quiz is over!!!!
-
-                    $(".question").addClass("inactive_question").removeClass("active_question");
-                    alert("thanks for playing");
-                    return;
-                }
-
-                $(".question:eq("  + current_question + ")").addClass("active_question").removeClass("inactive_question");
-                $(".question").not(':eq(' + current_question + ')').addClass("inactive_question").removeClass("active_question");
-
-
-
-    }
-
-            console.log();
-        }, 1000);
+        setInterval(Tick, 1000);
 
     });
 
@@ -191,11 +211,33 @@
 
 <div class="container" >
     <div class="frontpage card card-body bg-light">
-        <h1 class="card-title" id="quiz_name"></h1>
-        Quiz will last this long: <div id="quiz_duration"></div> seconds
-        Quiz starts in: <div id="starts_in"></div>
-        Your name is: <div id="nickname"></div>
-        Score: <span id="score"></span> of <span id="max_score"></span>
+    <h1 class="card-title" id="quiz_name"></h1>
+        <div class="row">
+            <div class="col-sm-5">
+                Quiz will last for this many seconds:
+            </div>
+            <div class="col-sm-7" id="quiz_duration"></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-5">
+                Quiz starts in this many seconds:
+            </div>
+            <div class="col-sm-7" id="starts_in"></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-5">
+                Your nickname:
+            </div>
+            <div class="col-sm-7" id="nickname"></div>
+        </div>
+        <div class="row">
+            <div class="col-sm-5">
+                Your score:
+            </div>
+            <div class="col-sm-7">
+                <span id="score">0</span> out of <span id="max_score"></span>
+            </div>
+        </div>
     </div>
 
 
