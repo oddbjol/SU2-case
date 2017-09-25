@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- Required meta tags -->
@@ -22,9 +22,9 @@
         [type='radio']{
             display: none;
         }
-    .btn-primary.active{
-        background-color: green;
-    }
+        .btn-primary.active{
+            background-color: green;
+        }
     </style>
 
     <script src="js/jquery-3.2.1.min.js"></script>
@@ -32,7 +32,7 @@
     <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script>
-    "use strict"
+    "use strict";
     let quiz;
     let current_question = -1; // current question is "quiz not started"
     let score = 0;
@@ -122,15 +122,17 @@
         let now = Math.floor(new Date().getTime()/1000);    // seconds since 1970
         let starts_in = quiz.startTime - now;               // seconds until quiz starts. if negative, quiz has started.
 
-        // if quiz has NOT started
-        if(starts_in > 0)
-            $("#starts_in").html(starts_in);
-        else
-            $("#starts_in").html("quiz has started!");
-
         let newActiveQuestion = getActiveQuestion();
 
-        // If quiz hasn't started yet, we don't need to do anything else in this tick.
+        if(newActiveQuestion == -1)                             // if quiz has NOT started
+            $("#starts_in").html(starts_in);
+        else if(newActiveQuestion == -2)                        // if quiz has ended
+            $("#starts_in").html("quiz is already over!");
+        else                                                    // otherwise, quiz is ongoing
+            $("#starts_in").html("quiz has started!");
+
+
+        // If quiz hasn't started yet, or quiz is over, we don't need to do anything else in this tick.
         if(newActiveQuestion < 0)
             return;
 
@@ -185,6 +187,10 @@
 
                 question_box.find(".card-title").html("Question " + (i+1) + " of " + quiz.questions.length);
                 question_box.find(".question_text").html(question.question);
+                if(question.picture_url){    // Set the picture if the question has one.
+                    question_box.find(".question_picture").attr("src",question.picture_url);
+                    question_box.find(".question_picture_link").attr("href",question.picture_url);
+                }
 
                 for(let j = 0; j < question.answers.length; j++){
                     let answer = question.answers[j];
@@ -225,6 +231,10 @@
     <div class="question_text">
         BLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONS
     </div>
+    <a class="question_picture_link">
+        <img class="question_picture img-responsive"></img>
+    </a>
+
     <div class="btn-group btn-group-vertical answer_box" data-toggle="buttons">
 
     </div>
