@@ -37,7 +37,22 @@
                             return Object.keys(data).length;    // Count the number of entries in the "scoreboard" object.
                                                                 // This is also the number of contestants.
                         }},
-                        { data: 'duration_seconds'}
+                        {   render: function(data,type,row,meta){
+                                let now = Math.floor(new Date().getTime()/1000);
+                                if(now > row.startTime + row.duration_seconds || now < row.startTime){ // Quiz is not active
+                                    return "";
+                                }
+                                else{
+                                    return row.startTime + row.duration_seconds - now;
+                                }
+                        }},
+                        {   render: function(data,type,row,meta){
+                                let now = Math.floor(new Date().getTime()/1000);
+                                if(now > row.startTime+row.duration_seconds){ //Quiz is over
+                                    return '<a href="scoreboard.jsp?uuid=' + row.uuid + '" class="btn btn-primary">scoreboard</a>';
+                                }
+                                return "";
+                        }}
                     ],
                     searching: false,
                     paging: false,
@@ -47,6 +62,7 @@
 
                 tbl.on('click','tr',function(){
                     selected_uuid = tbl.row(this).data().uuid;
+                    $("#nickname").val("");
                     $("#myModal").modal("show");
                 });
 
@@ -107,6 +123,7 @@
                     <th>Quiz name</th>
                     <th>Contestants</th>
                     <th>Remaining time (s)</th>
+                    <th></th>
                 </thead>
                 <tbody id="tbody">
                 </tbody>
