@@ -15,11 +15,11 @@
     <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <style>
-        tr{
-            cursor: pointer;
+        .row_winner{
+            background-color: green;
         }
-        .template_row{
-            display: none;
+        .row_winner:hover{
+            background-color: darkgreen !important;
         }
     </style>
     <script>
@@ -39,8 +39,27 @@
             type: 'GET',
             dataType: 'json',
             success: function(data) {
-                for(let key in data.scoreboard)
-                    $("#tbody").append("<tr><td>"+ key +"</td><td>"+ data.scoreboard[key] +"</td></tr>");
+                let maxKey = null;
+
+                // Which person got the highest score again?
+                for(let key in data.scoreboard){
+                    if(!maxKey || data.scoreboard[key] > data.scoreboard[maxKey]){
+                        maxKey = key;
+                    }
+                }
+
+                $(".quiz-name").html(data.name);
+                $("#info").html("The quiz is over. " + maxKey + " won!!!");
+
+                // Print the highscore table.
+                for(let key in data.scoreboard){
+                    let style = "";
+                    if(key == maxKey)
+                        style = ' class="row_winner"';
+
+                    $("#tbody").append("<tr" + style + "><td>"+ key +"</td><td>"+ data.scoreboard[key] +"</td></tr>");
+                }
+
             }
         });
 
@@ -50,13 +69,12 @@
 </head>
 <body>
 
-<tr class="template_row" id="template_row">
-    <td class="nick"></td>
-    <td class="points"></td>
-</tr>
-
 <div class="container" >
     <div id="frontpage">
+        <div class="card card-body bg-light">
+            <h1 class="card-title quiz-name"></h1>
+            <span id="info"></span>
+        </div>
         <table class="table table-responsive table-hover" id="tbl">
             <thead>
                 <th>Nickname</th>
@@ -66,6 +84,7 @@
 
             </tbody>
         </table>
+        <a href="index.html" class="btn btn-primary">Back</a>
     </div>
 </div>
 </body>
