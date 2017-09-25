@@ -118,7 +118,14 @@
         $("#score").html(score);
     }
 
+    function reloadChat(){
+
+    }
+
     function Tick(){
+
+        reloadChat();
+
         let now = Math.floor(new Date().getTime()/1000);    // seconds since 1970
         let starts_in = quiz.startTime - now;               // seconds until quiz starts. if negative, quiz has started.
 
@@ -270,6 +277,11 @@
                 <span id="score">0</span> out of <span id="max_score"></span>
             </div>
         </div>
+    </div>
+    <div class="card card-body bg-light chat">
+        <h2 class="card-title">Chat</h2>
+        blablablablablbla<br>
+        blablbalbla
     </div>
     <a href="index.html" class="btn btn-primary">Back</a>
 

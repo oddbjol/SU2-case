@@ -13,6 +13,7 @@ public class Quiz implements Serializable {
     private ArrayList<Question> questions = new ArrayList<Question>();
     private int duration_seconds;
     private long startTime; //seconds from 1970
+    private ArrayList<String> chat = new ArrayList<String>();
 
     public HashMap<String, Integer> getScoreboard() {
         return scoreboard;
@@ -74,4 +75,14 @@ public class Quiz implements Serializable {
     public long getStartTime() {return startTime;}
     public void setStartTime(long startTime) {this.startTime = startTime;}
 
+    public ArrayList<String> getChat() {
+        return chat;
+    }
+    public void setChat(ArrayList<String> chat) {
+        this.chat = chat;
+    }
+
+    public void addChatLine(String message){
+        chat.add(message);
+    }
 }

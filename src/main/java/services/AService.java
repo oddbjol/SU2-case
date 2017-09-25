@@ -78,6 +78,34 @@ public class AService {
         return Response.ok(score).build();
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("quiz/{uuid}/chat")
+    public Response getChat(@PathParam("uuid") String uuid){
+        uuid=uuid.trim();
+
+        Quiz curQuiz = quizes.get(uuid);
+
+        ArrayList<String> chat = curQuiz.getChat();
+
+        return Response.ok(chat).build();
+    }
+
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("quiz/{uuid}/chat")
+    public Response addChatLine(@PathParam("uuid") String uuid, String message){
+        uuid=uuid.trim();
+        message=message.trim();
+
+        Quiz curQuiz = quizes.get(uuid);
+
+        curQuiz.addChatLine(message);
+
+        return Response.ok().build();
+    }
+
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("quiz/{uuid}/setScore/{nick}")
