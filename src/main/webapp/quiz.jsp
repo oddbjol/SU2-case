@@ -120,6 +120,14 @@
 
     function reloadChat(){
 
+        $.getJSON("rest/quizes/quiz/"+quiz.uuid+"/chat", null, function(data){
+            let messages = ""   ;
+            for(let message of data){
+                messages += message + "<br>";
+            }
+            $("#chat").html(messages);
+
+        });
     }
 
     function Tick(){
@@ -216,6 +224,24 @@
             }
         });
 
+        $("#chat_input").keyup(function(event){
+            if(event.keyCode == 13){
+                let message = "&lt;" + nick + "&gt;: " + $("#chat_input").val();
+                $("#chat_input").val("");
+
+                let url = "rest/quizes/quiz/" + quiz.uuid + "/chat";
+
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: message,
+                    contentType: 'text/plain;',
+                    success: function(result) {
+                    }
+                });
+            }
+        });
+
         setInterval(Tick, 1000);
 
     });
@@ -278,10 +304,14 @@
             </div>
         </div>
     </div>
-    <div class="card card-body bg-light chat">
+    <div class="card card-body bg-light">
         <h2 class="card-title">Chat</h2>
+        <div id="chat">
         blablablablablbla<br>
         blablbalbla
+        </div>
+
+        <input type="text" id="chat_input">
     </div>
     <a href="index.html" class="btn btn-primary">Back</a>
 

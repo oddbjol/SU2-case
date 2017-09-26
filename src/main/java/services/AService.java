@@ -40,6 +40,10 @@ public class AService {
                 quiz.addNick("testperson 2");
 
             quizes.put(quiz.getUuid(), quiz);
+
+            HashMap <Integer, String> timeTest = new HashMap<Integer, String>();
+            timeTest.put(7, "test");
+            
         }
     }
 
