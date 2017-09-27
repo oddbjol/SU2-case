@@ -11,7 +11,7 @@ public class AService {
 
     private static HashMap<String, Quiz> quizes = new HashMap<String, Quiz>();
 
-    // debug code
+    // Everything inside this static block is used for demonstration/debug purposes.
     static{
 
         int num_quizes = 5;
@@ -33,7 +33,8 @@ public class AService {
                 for(int k = 0; k < num_answers; k++)
                     answers.add("Alternative " + (k+1) + (k == right_answer ? " (right) " : " (wrong) "));
 
-                Question q = new Question("Question " + (j+1), answers, right_answer, "", question_duration);
+                Question q = new Question("Question " + (j+1) + " goes here with a lot of text blah blah blah blah blah blah blah blah blah blah blah blah blah ot of text blah blah blah blah blah blah blah blah blah blah blah blah blah blahot of text blah blah blah blah blah blah blah blah blah blah blah blah blah blahot of text blah blah blah blah blah blah blah blah blah blah blah blah blah blahot of text blah blah blah blah blah blah blah blah blah blah blah blah blah blahot of text blah blah blah blah blah blah blah blah blah blah blah blah blah blah",
+                                                answers, right_answer, "", question_duration);
                 quiz.addQuestion(q);
             }
             long now = new Date().getTime()/1000;

@@ -49,7 +49,7 @@
                 }
 
                 $(".quiz-name").html(data.name);
-                $("#info").html("The quiz is over. " + maxKey + " won!!!");
+                $("#info").html("The quiz is over. " + (maxKey == null ? "no one" : maxKey) + " won!!!");
 
                 // Print the highscore table.
                 for(let key in data.scoreboard){

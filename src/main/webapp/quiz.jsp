@@ -25,7 +25,22 @@
         .btn-primary.active{
             background-color: green;
         }
+        #chat{
+            float: left;
+            padding: 20px;
+        }
+        #users{
+            float: right;
+            padding: 20px;
+            min-width: 200px;
+            min-height: 100%;
+        }
+        .question_headline{
+            font-weight: bold;
+            font-size: 1.3em;
+        }
     </style>
+
 
     <script src="js/jquery-3.2.1.min.js"></script>
     <script src="http://cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"></script>
@@ -209,11 +224,11 @@
         let newActiveQuestion = quiz.getActiveQuestion();
 
         if(!quiz.hasStarted())                             // if quiz has NOT started
-            $("#starts_in").html(quiz.timeUntilStart());
+            $("#starts_in").html("starts in " + quiz.timeUntilStart() + " seconds.");
         else if(quiz.hasEnded())                        // if quiz has ended
-            $("#starts_in").html("quiz is already over!");
+            $("#starts_in").html("already over!");
         else                                                    // otherwise, quiz is ongoing
-            $("#starts_in").html("quiz has started!");
+            $("#starts_in").html("started");
 
 
         // If quiz hasn't started yet, we don't need to do anything else in this tick.
@@ -344,8 +359,11 @@
 </div>
 
 <div class="card card-body bg-light question_template inactive_question">
-    <h2 class="card-title">Question 1/10</h2>
-    <span class="question_seconds_left"></span>
+        <div>
+        <span class="card-title question_headline">Question 1/10</span>
+        <span class="question_seconds_left"></span>
+        </div>
+
     <div class="question_text">
     </div>
     <a class="question_picture_link">
@@ -369,7 +387,7 @@
         </div>
         <div class="row">
             <div class="col-sm-5">
-                Quiz starts in this many seconds:
+                Quiz status:
             </div>
             <div class="col-sm-7" id="starts_in"></div>
         </div>
@@ -389,11 +407,12 @@
         </div>
     </div>
     <div class="card card-body bg-light">
-        <h2 class="card-title">Chat</h2>
+        <div><h2 class="card-title">Chat</h2></div>
+
         <div class="row">
-        <div class="col-sm-8" id="chat" style="float: left;padding: 20px;"></div>
-        <div class="col-sm-4" id="users" style="float:right; min-width: 200px; min-height:100%; padding:20px;"><b><u>participants</u></b>
-            <div id="userlist" display='list-style-type: none;'>
+        <div class="col-sm-8" id="chat"></div>
+        <div class="col-sm-4" id="users"><b><u>Contestants</u></b>
+            <div id="userlist">
             </div>
         </div>
         </div>
