@@ -4,46 +4,44 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Path("/quizes/")
 public class AService {
 
     private static HashMap<String, Quiz> quizes = new HashMap<String, Quiz>();
 
+    // debug code
     static{
-        for(int i = 0; i < 50; i++){
+
+        int num_quizes = 20;
+        int question_duration = 10;
+        int num_questions = 10;
+        int min_answers = 2;
+        int max_answers = 6;
+
+
+        for(int i = 0; i < num_quizes; i++){
             Quiz quiz = new Quiz("Quiz " + i);
-            Question q1 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
-            Question q2 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
-            Question q3 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
-            Question q4 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
-            Question q5 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
-            Question q6 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
-            Question q7 = new Question("Question 1",new String[]{"wrong","right","wrong"},1,"",20);
 
-            quiz.addQuestion(q1);
-            quiz.addQuestion(q2);
-            quiz.addQuestion(q3);
-            quiz.addQuestion(q4);
-            quiz.addQuestion(q5);
-            quiz.addQuestion(q6);
-            quiz.addQuestion(q7);
+            for(int j = 0; j < num_questions; j++){
+                int num_answers = randomInt(min_answers, max_answers);
+                int right_answer = randomInt(0, num_answers-1);
 
-            quiz.setStartTime((new Date().getTime()/1000)+i*140);
-            quiz.setDuration_seconds(140);
+                ArrayList<String> answers = new ArrayList<String>();
+
+                for(int k = 0; k < num_answers; k++)
+                    answers.add("Alternative " + (k+1) + (k == right_answer ? " (right) " : " (wrong) "));
+
+                Question q = new Question("Question " + (j+1), answers, right_answer, "", question_duration);
+                quiz.addQuestion(q);
+            }
+            long now = new Date().getTime()/1000;
+            quiz.setStartTime(now + i *(num_questions*question_duration));
             quiz.addNick("testperson");
-            if(i == 0) // first quiz gets extra contestant for testing purposes
-                quiz.addNick("testperson 2");
+            quiz.addNick("testperson 2");
 
             quizes.put(quiz.getUuid(), quiz);
-
-            HashMap <Integer, String> timeTest = new HashMap<Integer, String>();
-            timeTest.put(7, "test");
-            
         }
     }
 
@@ -132,5 +130,13 @@ public class AService {
         quizes.put(quiz.getUuid(), quiz);
     }
 
-
+    /**
+     * Returns random number between min (inclusive) and max (inclusive)
+     * @param min
+     * @param max
+     * @return
+     */
+    private static int randomInt(int min, int max){
+        return (new Random()).nextInt(max - min + 1) + min;
+    }
 }

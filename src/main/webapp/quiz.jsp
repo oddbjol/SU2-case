@@ -39,6 +39,46 @@
     let uuid;
     let nick;
 
+    function Quiz(newQuiz){
+        this.name = newQuiz.name;
+        this.uuid = newQuiz.uuid;
+        this.duration_seconds = newQuiz.duration_seconds;
+        this.startTime = newQuiz.startTime;
+        this.scoreboard = newQuiz.scoreboard;
+        this.chat = newQuiz.chat;
+        this.questions = newQuiz.questions;
+
+        // Is the quiz currently running?
+        this.running = function(){
+            let time_spent = this.timeSinceStart();
+
+            return !(time_spent < 0 || time_spent >= this.duration_seconds);
+        }
+
+        // Seconds since quiz started. Negative value means quiz hasn't started.
+        this.timeSinceStart = function(){
+            return now() - quiz.startTime;
+        }
+
+        // Seconds until quiz ends. Negative value means quiz has ended.
+        this.timeUntilEnd = function(){
+            return (this.startTime + this.duration_seconds) - now();
+        }
+
+        // Seconds until quiz starts. Negative value means quiz has started.
+        this.timeUntilStart = function(){
+            return this.startTime - now();
+        }
+
+        //this.currentQuestion
+
+    }
+
+        // seconds since 1970
+        function now(){
+            return Math.floor(new Date().getTime()/1000);
+        }
+
     // -1 if quiz hasn't started, -2 if it's over, otherwise index of right question.
     function getActiveQuestion(){
         let now = Math.floor(new Date().getTime()/1000); //seconds since 1970
@@ -134,6 +174,8 @@
 
         reloadChat();
 
+        console.log("seconds since start: " + quiz.timeSinceStart() +  " seconds until start: " + quiz.timeUntilStart() + " running: " + quiz.running() + " time until end: " + quiz.timeUntilEnd());
+
         let now = Math.floor(new Date().getTime()/1000);    // seconds since 1970
         let starts_in = quiz.startTime - now;               // seconds until quiz starts. if negative, quiz has started.
 
@@ -186,7 +228,7 @@
         });
 
         $.getJSON(url, null, function(data){
-            quiz = data;
+            quiz = new Quiz(data);
 
             $("#quiz_name").html(quiz.name);
             $("#quiz_duration").html(quiz.duration_seconds);
@@ -307,8 +349,6 @@
     <div class="card card-body bg-light">
         <h2 class="card-title">Chat</h2>
         <div id="chat">
-        blablablablablbla<br>
-        blablbalbla
         </div>
 
         <input type="text" id="chat_input">
