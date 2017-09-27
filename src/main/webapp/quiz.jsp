@@ -191,7 +191,7 @@
             let userlist_str = "";
 
             for(let user in tmpQuiz.scoreboard)
-                userlist_str += "<li class='list-group-item'>" + user + " (" + tmpQuiz.scoreboard[user] + " points )</li>"
+                userlist_str += "<div>" + user + " (" + tmpQuiz.scoreboard[user] + " points )</div>"
 
             $("#userlist").html(userlist_str);
         });
@@ -391,10 +391,10 @@
     <div class="card card-body bg-light">
         <h2 class="card-title">Chat</h2>
         <div class="row">
-        <div class="col-sm-8" id="chat" style="float: left; border: solid black 1px; padding: 20px;"></div>
-        <div class="col-sm-4" id="users" style="float:right; border: solid black 1px; min-width: 200px; min-height:100%; padding:20xp;"><b><u>participants</u></b>
-            <ul id="userlist" class="list-group">
-            </ul>
+        <div class="col-sm-8" id="chat" style="float: left;padding: 20px;"></div>
+        <div class="col-sm-4" id="users" style="float:right; min-width: 200px; min-height:100%; padding:20px;"><b><u>participants</u></b>
+            <div id="userlist" display='list-style-type: none;'>
+            </div>
         </div>
         </div>
 
