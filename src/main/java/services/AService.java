@@ -14,7 +14,7 @@ public class AService {
     // debug code
     static{
 
-        int num_quizes = 20;
+        int num_quizes = 5;
         int question_duration = 10;
         int num_questions = 10;
         int min_answers = 2;
@@ -38,8 +38,6 @@ public class AService {
             }
             long now = new Date().getTime()/1000;
             quiz.setStartTime(now + i *(num_questions*question_duration));
-            quiz.addNick("testperson");
-            quiz.addNick("testperson 2");
 
             quiz.addChatLine("&lt;someone&gt;: What is this?");
             quiz.addChatLine("&lt;someone else&gt;: Looks like a chat.");

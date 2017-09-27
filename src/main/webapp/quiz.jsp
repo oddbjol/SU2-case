@@ -110,7 +110,7 @@
                     return this.questions[i];
             }
 
-            throw "This should not happen. getActiveQuestion() failed to find active question while quiz is running!";
+            return null;
         };
 
     }
@@ -184,6 +184,19 @@
             $("#chat").html(messages);
 
         });
+
+        $.getJSON("rest/quizes/quiz/"+quiz.uuid, null, function(data){
+            let tmpQuiz = new Quiz(data);
+
+            let userlist_str = "";
+
+            for(let user in tmpQuiz.scoreboard)
+                userlist_str += "<li class='list-group-item'>" + user + " (" + tmpQuiz.scoreboard[user] + " points )</li>"
+
+            $("#userlist").html(userlist_str);
+        });
+
+
     }
 
     //Executes once a second
@@ -235,6 +248,16 @@
     $(document).ready(function(){
         uuid = "<%= request.getParameter("uuid") %>";
         nick = "<%= request.getParameter("nickname") %>";
+
+        $.ajax({
+        url: "rest/quizes/quiz/" + uuid + "/chat",
+        type: 'POST',
+        data: "<b>* " + nick + " joined the quiz *</b>",
+        contentType: 'text/plain;',
+        success: function(result) {
+        }
+        });
+
         let url = "rest/quizes/quiz/" + uuid;
 
         $.ajax({
@@ -367,8 +390,14 @@
     </div>
     <div class="card card-body bg-light">
         <h2 class="card-title">Chat</h2>
-        <div id="chat">
+        <div class="row">
+        <div class="col-sm-8" id="chat" style="float: left; border: solid black 1px; padding: 20px;"></div>
+        <div class="col-sm-4" id="users" style="float:right; border: solid black 1px; min-width: 200px; min-height:100%; padding:20xp;"><b><u>participants</u></b>
+            <ul id="userlist" class="list-group">
+            </ul>
         </div>
+        </div>
+
 
         <input type="text" id="chat_input">
     </div>
