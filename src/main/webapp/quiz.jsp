@@ -96,6 +96,7 @@
             return -1;
         };
 
+        // Which question is currently being answered? This might be null if quiz is not running.
         this.getActiveQuestion = function(){
             if(!this.running())
                 return null;
@@ -112,21 +113,6 @@
             throw "This should not happen. getActiveQuestion() failed to find active question while quiz is running!";
         };
 
-        // Check if user has chosen the right answer for the current question
-        this.rightAnswer = function(){
-        if(!this.running())
-            return false;   // Not a valid question.
-
-        let correctAnswerIndex = current_question.right_answer;
-        let currentAnswerIndex = $(".active_question").first().find(".btn.active").find(".radio").val()
-
-        if(!currentAnswerIndex || !correctAnswerIndex) // these should both have values, or the comparison is meaningless
-            return false;
-
-        return (currentAnswerIndex == correctAnswerIndex);
-
-        }
-
     }
 
         // seconds since 1970
@@ -134,7 +120,25 @@
             return Math.floor(new Date().getTime()/1000);
         }
 
-    function updateTitle(){
+    // Check if user has chosen the right answer for the current question
+    function rightAnswer(question){
+        if(question == null)
+            return;
+
+        let correctAnswerIndex = question.right_answer;
+
+        let currentAnswerIndex = $(".active_question").first().find(".btn.active").find(".radio").val();
+
+        console.log(currentAnswerIndex + " " + correctAnswerIndex);
+
+        if(!currentAnswerIndex || !correctAnswerIndex) // these should both have values, or the comparison is meaningless
+            return false;
+
+        return (currentAnswerIndex == correctAnswerIndex);
+
+    }
+
+    function updateSecondsLeft(){
 
         if(!quiz.running()) // Only check if we're on an active question
             return;
@@ -146,14 +150,11 @@
 
     // Adds 1 to current score if right answer is selected, and sends score to server.
     // Updates user's score on website
-    // TODO: Send score to server
-    function checkAndUpdateScore(){
+    function checkAndUpdateScore(question){
+        // Only bother checking for valid questions
+        if(question != null){
 
-        // We won't bother checking if the quiz isn't running.
-        if(current_question != null){
-
-            if(quiz.rightAnswer()){
-
+            if(rightAnswer(question)){
                 score++;
 
                  $.ajax({
@@ -185,6 +186,7 @@
         });
     }
 
+    //Executes once a second
     function Tick(){
 
         reloadChat();
@@ -205,15 +207,15 @@
         if(!quiz.hasStarted())
             return;
 
-        updateTitle();
+        updateSecondsLeft();
 
         if(newActiveQuestion !== current_question){  // We are jumping to next question
 
-            checkAndUpdateScore(); //calculate user's score and send it to server.
+            checkAndUpdateScore(current_question); //calculate user's score and send it to server.
 
             current_question = newActiveQuestion;
 
-            if(quiz.hasEnded()){    // quiz is over!!!!
+            if(current_question == null){    // quiz is over!!!!
                 console.log("Checking score one last time " + quiz.indexOfQuestion(quiz.getActiveQuestion));
                 checkAndUpdateScore(); // Add/save the final score before we shut down the whole quiz. This line should probably be refactored.
                 console.log("We just finished checking score one last time " + quiz.indexOfQuestion(quiz.getActiveQuestion));
@@ -248,7 +250,7 @@
         });
 
         $.getJSON(url, null, function(data){
-            quiz = new Quiz(data);
+            quiz = new Quiz(data); // Encapsulate the data into a Quiz object that has constructor, helper functions, etc.
 
             $("#quiz_name").html(quiz.name);
             $("#quiz_duration").html(quiz.duration_seconds);
@@ -324,7 +326,6 @@
     <h2 class="card-title">Question 1/10</h2>
     <span class="question_seconds_left"></span>
     <div class="question_text">
-        BLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONSBLAH BLAH BLAH QUESTIONS
     </div>
     <a class="question_picture_link">
         <img class="question_picture img-responsive"></img>
