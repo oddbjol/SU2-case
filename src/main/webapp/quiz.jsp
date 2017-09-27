@@ -124,7 +124,6 @@
         if(!quiz.running()) // Only check if we're on an active question
             return;
 
-
         $(".active_question").first().find(".question_seconds_left").html("(" + quiz.timeLeftInCurrentQuestion() + " / " + current_question.duration_seconds + " seconds left)");
     }
 
@@ -187,45 +186,42 @@
 
         //console.log("seconds since start: " + quiz.timeSinceStart() +  " seconds until start: " + quiz.timeUntilStart() + " running: " + quiz.running() + " time until end: " + quiz.timeUntilEnd());
 
-
-
-        let now = Math.floor(new Date().getTime()/1000);    // seconds since 1970
-        let starts_in = quiz.startTime - now;               // seconds until quiz starts. if negative, quiz has started.
-
         let newActiveQuestion = quiz.getActiveQuestion();
 
         if(!quiz.hasStarted())                             // if quiz has NOT started
-            $("#starts_in").html(starts_in);
+            $("#starts_in").html(quiz.timeUntilStart());
         else if(quiz.hasEnded())                        // if quiz has ended
             $("#starts_in").html("quiz is already over!");
         else                                                    // otherwise, quiz is ongoing
             $("#starts_in").html("quiz has started!");
 
 
-        // If quiz hasn't started yet, or quiz is over, we don't need to do anything else in this tick.
-        if(!quiz.running())
+        // If quiz hasn't started yet, we don't need to do anything else in this tick.
+        if(!quiz.hasStarted())
             return;
-
-        console.log(quiz.getActiveQuestion().question);
 
         updateTitle();
 
         if(newActiveQuestion !== current_question){  // We are jumping to next question
 
-
             checkAndUpdateScore();
 
             current_question = newActiveQuestion;
 
-            if(newActiveQuestion == null){    // quiz is over!!!!
-                $(".question").addClass("inactive_question").removeClass("active_question");
-                alert("thanks for playing");
+            if(!quiz.running()){    // quiz is over!!!!
+                endQuiz();
                 return;
             }
 
             $(".question:eq("  + quiz.indexOfQuestion(current_question) + ")").addClass("active_question").removeClass("inactive_question");
             $(".question").not(':eq(' + quiz.indexOfQuestion(current_question) + ')').addClass("inactive_question").removeClass("active_question");
         }
+    }
+
+    function endQuiz(){
+        $(".question").addClass("inactive_question").removeClass("active_question");
+        alert("thanks for playing");
+
     }
 
     $(document).ready(function(){
