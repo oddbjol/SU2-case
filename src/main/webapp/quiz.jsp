@@ -112,6 +112,18 @@
             throw "This should not happen. getActiveQuestion() failed to find active question while quiz is running!";
         };
 
+        // Check if user has chosen the right answer for the current question
+        this.rightAnswer = function(){
+        if(!this.running())
+            return false;   // Not a valid question.
+
+        let correctAnswerIndex = current_question.right_answer;
+        let currentAnswerIndex = $(".active_question").first().find(".btn.active").find(".radio").val()
+
+        return (currentAnswerIndex == correctAnswerIndex);
+
+        }
+
     }
 
         // seconds since 1970
@@ -127,28 +139,16 @@
         $(".active_question").first().find(".question_seconds_left").html("(" + quiz.timeLeftInCurrentQuestion() + " / " + current_question.duration_seconds + " seconds left)");
     }
 
-    // Check if user has chosen the right answer for the current question
-    function rightAnswer(){
-        if(!quiz.running())
-            return false;   // Not a valid question.
 
-        let correctAnswerIndex = current_question.right_answer;
-        let currentAnswerIndex = $(".active_question").first().find(".btn.active").find(".radio").val()
-
-
-        console.log("you selected " + currentAnswerIndex + " correct is: " + correctAnswerIndex);
-        return (currentAnswerIndex == correctAnswerIndex);
-
-    }
 
     // Adds 1 to current score if right answer is selected, and sends score to server.
     // Updates user's score on website
     // TODO: Send score to server
     function checkAndUpdateScore(){
 
-        // We won't bother checking if the quiz hasn't started or has ended
-        if(current_question >= 0){
-            if(rightAnswer()){
+        // We won't bother checking if the quiz isn't running.
+        if(quiz.running()){
+            if(quiz.rightAnswer()){
                 score++;
 
                  $.ajax({

@@ -41,6 +41,11 @@ public class AService {
             quiz.addNick("testperson");
             quiz.addNick("testperson 2");
 
+            quiz.addChatLine("&lt;someone&gt;: What is this?");
+            quiz.addChatLine("&lt;someone else&gt;: Looks like a chat.");
+            quiz.addChatLine("&lt;someone&gt;: How do we use it?");
+            quiz.addChatLine("&lt;someone else&gt;: Just type something, duh...");
+
             quizes.put(quiz.getUuid(), quiz);
         }
     }
