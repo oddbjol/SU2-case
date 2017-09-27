@@ -18,6 +18,15 @@
             tr{
                 cursor: pointer;
             }
+            .quiz-started{
+                color: green;
+            }
+            .quiz-finished{
+                color: gray;
+            }
+            .quiz_yettostart{
+                color: gray;
+            }
         </style>
         <script>
             $(document).ready(function(){
@@ -39,11 +48,15 @@
                         }},
                         {   render: function(data,type,row,meta){
                                 let now = Math.floor(new Date().getTime()/1000);
-                                if(now > row.startTime + row.duration_seconds || now < row.startTime){ // Quiz is not active
-                                    return "";
+
+                                if(now > row.startTime + row.duration_seconds) {
+                                    return "<span class='quiz-finished'>Quiz finished</span>";
+                                }
+                                else if(now < row.startTime){ // Quiz is not active
+                                    return "<span class='quiz_yettostart'>Quiz starts in " + (row.startTime - now) + " seconds</span>";
                                 }
                                 else{
-                                    return row.startTime + row.duration_seconds - now;
+                                    return "<span class='quiz-started'>Quiz ends in " + (row.startTime + row.duration_seconds - now) + " seconds</span>";
                                 }
                         }},
                         {   render: function(data,type,row,meta){
@@ -117,6 +130,7 @@
 
     <div class="container" >
         <div id="frontpage">
+            <h4>Click a quiz in the list below to join in!</h4>
             <table class="table table-responsive table-hover" id="tbl">
                 <thead>
                     <th style="display:none"></th>
