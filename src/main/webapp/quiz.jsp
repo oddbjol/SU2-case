@@ -120,6 +120,9 @@
         let correctAnswerIndex = current_question.right_answer;
         let currentAnswerIndex = $(".active_question").first().find(".btn.active").find(".radio").val()
 
+        if(!currentAnswerIndex || !correctAnswerIndex) // these should both have values, or the comparison is meaningless
+            return false;
+
         return (currentAnswerIndex == correctAnswerIndex);
 
         }
@@ -147,8 +150,10 @@
     function checkAndUpdateScore(){
 
         // We won't bother checking if the quiz isn't running.
-        if(quiz.running()){
+        if(current_question != null){
+
             if(quiz.rightAnswer()){
+
                 score++;
 
                  $.ajax({
@@ -204,11 +209,14 @@
 
         if(newActiveQuestion !== current_question){  // We are jumping to next question
 
-            checkAndUpdateScore();
+            checkAndUpdateScore(); //calculate user's score and send it to server.
 
             current_question = newActiveQuestion;
 
-            if(!quiz.running()){    // quiz is over!!!!
+            if(quiz.hasEnded()){    // quiz is over!!!!
+                console.log("Checking score one last time " + quiz.indexOfQuestion(quiz.getActiveQuestion));
+                checkAndUpdateScore(); // Add/save the final score before we shut down the whole quiz. This line should probably be refactored.
+                console.log("We just finished checking score one last time " + quiz.indexOfQuestion(quiz.getActiveQuestion));
                 endQuiz();
                 return;
             }
