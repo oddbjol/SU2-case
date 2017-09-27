@@ -216,11 +216,9 @@
             current_question = newActiveQuestion;
 
             if(current_question == null){    // quiz is over!!!!
-                console.log("Checking score one last time " + quiz.indexOfQuestion(quiz.getActiveQuestion));
                 checkAndUpdateScore(); // Add/save the final score before we shut down the whole quiz. This line should probably be refactored.
-                console.log("We just finished checking score one last time " + quiz.indexOfQuestion(quiz.getActiveQuestion));
                 endQuiz();
-                return;
+
             }
 
             $(".question:eq("  + quiz.indexOfQuestion(current_question) + ")").addClass("active_question").removeClass("inactive_question");
@@ -230,8 +228,8 @@
 
     function endQuiz(){
         $(".question").addClass("inactive_question").removeClass("active_question");
-        alert("thanks for playing");
-
+        alert("thanks for playing! Taking you to the scoreboard now.");
+        window.location.href="scoreboard.jsp?uuid=" + quiz.uuid + "&nickname=" + nick;
     }
 
     $(document).ready(function(){
