@@ -53,24 +53,64 @@
             let time_spent = this.timeSinceStart();
 
             return !(time_spent < 0 || time_spent >= this.duration_seconds);
-        }
+        };
 
         // Seconds since quiz started. Negative value means quiz hasn't started.
         this.timeSinceStart = function(){
             return now() - quiz.startTime;
-        }
+        };
 
         // Seconds until quiz ends. Negative value means quiz has ended.
         this.timeUntilEnd = function(){
             return (this.startTime + this.duration_seconds) - now();
-        }
+        };
 
         // Seconds until quiz starts. Negative value means quiz has started.
         this.timeUntilStart = function(){
             return this.startTime - now();
-        }
+        };
 
-        //this.currentQuestion
+        this.hasStarted = function(){
+            return (this.timeUntilStart() < 0);
+        };
+
+        this.hasEnded = function(){
+            return (this.timeUntilEnd() < 0);
+        };
+
+        this.timeLeftInCurrentQuestion = function(){
+
+            let pointInTimeNextQuestion = quiz.startTime;
+            for(let i = 0; i <= this.indexOfQuestion(current_question); i++)
+                pointInTimeNextQuestion += +quiz.questions[i].duration_seconds;
+
+            return pointInTimeNextQuestion - now();
+        };
+
+        // Returns which index (if any) a given question object is at in our question array
+        this.indexOfQuestion = function(question){
+            for(let i = 0; i < this.questions.length; i++){
+                if(question === this.questions[i])
+                    return i;
+            }
+            return -1;
+        };
+
+        this.getActiveQuestion = function(){
+            if(!this.running())
+                return null;
+
+            let time_spent = this.timeSinceStart();
+
+            let time_counter = 0;
+            for(let i = 0; i < this.questions.length; i++){
+                time_counter += this.questions[i].duration_seconds;
+                if(time_counter > time_spent)   // This means the user is currently answering questions[i]. index = i.
+                    return this.questions[i];
+            }
+
+            throw "This should not happen. getActiveQuestion() failed to find active question while quiz is running!";
+        };
 
     }
 
@@ -79,55 +119,26 @@
             return Math.floor(new Date().getTime()/1000);
         }
 
-    // -1 if quiz hasn't started, -2 if it's over, otherwise index of right question.
-    function getActiveQuestion(){
-        let now = Math.floor(new Date().getTime()/1000); //seconds since 1970
-        let time_spent = now - quiz.startTime;
-
-        if(time_spent < 0){ // Still waiting for quiz to start...
-            return -1;
-        }
-        else if(time_spent >= quiz.duration_seconds){    // The quiz is already over!
-            return -2;
-        }
-        // The quiz should be active.
-        let time_counter = 0;
-        for(let i = 0; i < quiz.questions.length; i++){
-            time_counter += quiz.questions[i].duration_seconds;
-            if(time_counter > time_spent)   // This means the user is currently answering questions[i]. index = i.
-                return i;
-        }
-
-        return -2; // Shouldn't happen, but just in case we get here we can conclude that quiz is over
-
-    }
-
     function updateTitle(){
 
-        if(current_question < 0) // Only check if we're on an active question
+        if(!quiz.running()) // Only check if we're on an active question
             return;
 
-        let pointInTimeNextQuestion = quiz.startTime;
-        for(let i = 0; i <= current_question; i++)
-            pointInTimeNextQuestion += +quiz.questions[i].duration_seconds;
 
-        let now = Math.floor(new Date().getTime()/1000);
-        let timeLeft = pointInTimeNextQuestion - now;
-
-        $(".active_question").first().find(".question_seconds_left").html("(" + timeLeft + " / " + quiz.questions[current_question].duration_seconds + " seconds left)");
+        $(".active_question").first().find(".question_seconds_left").html("(" + quiz.timeLeftInCurrentQuestion() + " / " + current_question.duration_seconds + " seconds left)");
     }
 
     // Check if user has chosen the right answer for the current question
     function rightAnswer(){
-      if(current_question < 0)
-        return false;   // Not a valid question.
+        if(!quiz.running())
+            return false;   // Not a valid question.
 
-    let correctAnswerIndex = quiz.questions[current_question].right_answer;
-    let currentAnswerIndex = $(".active_question").first().find(".btn.active").find(".radio").val()
+        let correctAnswerIndex = current_question.right_answer;
+        let currentAnswerIndex = $(".active_question").first().find(".btn.active").find(".radio").val()
 
 
-    console.log("you selected " + currentAnswerIndex + " correct is: " + correctAnswerIndex);
-    return (currentAnswerIndex == correctAnswerIndex);
+        console.log("you selected " + currentAnswerIndex + " correct is: " + correctAnswerIndex);
+        return (currentAnswerIndex == correctAnswerIndex);
 
     }
 
@@ -174,41 +185,46 @@
 
         reloadChat();
 
-        console.log("seconds since start: " + quiz.timeSinceStart() +  " seconds until start: " + quiz.timeUntilStart() + " running: " + quiz.running() + " time until end: " + quiz.timeUntilEnd());
+        //console.log("seconds since start: " + quiz.timeSinceStart() +  " seconds until start: " + quiz.timeUntilStart() + " running: " + quiz.running() + " time until end: " + quiz.timeUntilEnd());
+
+
 
         let now = Math.floor(new Date().getTime()/1000);    // seconds since 1970
         let starts_in = quiz.startTime - now;               // seconds until quiz starts. if negative, quiz has started.
 
-        let newActiveQuestion = getActiveQuestion();
+        let newActiveQuestion = quiz.getActiveQuestion();
 
-        if(newActiveQuestion == -1)                             // if quiz has NOT started
+        if(!quiz.hasStarted())                             // if quiz has NOT started
             $("#starts_in").html(starts_in);
-        else if(newActiveQuestion == -2)                        // if quiz has ended
+        else if(quiz.hasEnded())                        // if quiz has ended
             $("#starts_in").html("quiz is already over!");
         else                                                    // otherwise, quiz is ongoing
             $("#starts_in").html("quiz has started!");
 
 
         // If quiz hasn't started yet, or quiz is over, we don't need to do anything else in this tick.
-        if(newActiveQuestion < 0)
+        if(!quiz.running())
             return;
+
+        console.log(quiz.getActiveQuestion().question);
 
         updateTitle();
 
-        if(newActiveQuestion != current_question){  // We are jumping to next question
+        if(newActiveQuestion !== current_question){  // We are jumping to next question
+
 
             checkAndUpdateScore();
 
             current_question = newActiveQuestion;
 
-            if(newActiveQuestion == -2){    // quiz is over!!!!
+            if(newActiveQuestion == null){    // quiz is over!!!!
                 $(".question").addClass("inactive_question").removeClass("active_question");
                 alert("thanks for playing");
                 return;
             }
 
-            $(".question:eq("  + current_question + ")").addClass("active_question").removeClass("inactive_question");
-            $(".question").not(':eq(' + current_question + ')').addClass("inactive_question").removeClass("active_question");
+            $(".question:eq("  + quiz.indexOfQuestion(current_question) + ")").addClass("active_question").removeClass("inactive_question");
+            $(".question").not(':eq(' + quiz.indexOfQuestion(current_question) + ')').addClass("inactive_question").removeClass("active_question");
         }
     }
 
